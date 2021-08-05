@@ -24,7 +24,6 @@ async def kick_members_without_subscription(bot):
 def setup_scheduler(bot):
     sched = AsyncIOScheduler()
 
-    # TODO remove test
     sched.add_job(send_expired_notification, CronTrigger(hour=18), args=[bot])
     sched.add_job(kick_members_without_subscription, CronTrigger(hour=18), args=[bot])
 

@@ -16,7 +16,9 @@ def upsert_user_subscription(telegram_user_id: int):
 
     sub.update_one(
         {"telegram_user_id": telegram_user_id},
-        {"$set": {"expired_date": new_expired_date}},
+        {"$set": {"expired_date": new_expired_date,
+                  "subscribed": True}},
+
         upsert=True)
 
     return new_expired_date
@@ -54,7 +56,8 @@ def get_users_with_expired_sub():
     today = datetime.utcnow()
     next_day = datetime.utcnow() + timedelta(days=1)
 
-    users = sub.find({"expired_date": {"$lte": next_day, "$gt": today}},
+    users = sub.find({"expired_date": {"$lte": next_day, "$gt": today},
+                      "subscribed": True},
                      {'telegram_user_id': True, '_id': False})
     users_list = list(map(lambda user: user['telegram_user_id'], users))
 
@@ -65,8 +68,18 @@ def get_users_without_sub():
     sub = COLLS['subscriptions']
     current_day = datetime.utcnow()
 
-    users = sub.find({"expired_date": {"$lte": current_day}},
+    users = sub.find({"expired_date": {"$lte": current_day},
+                      "subscribed": True},
                      {'telegram_user_id': True, '_id': False})
     users_list = list(map(lambda user: user['telegram_user_id'], users))
 
     return users_list
+
+
+def unsubscribe_user_from_db(user_id):
+    sub = COLLS['subscriptions']
+
+    sub.update_one(
+        {"telegram_user_id": user_id},
+        {"$set": {"subscribed": False}}
+    )

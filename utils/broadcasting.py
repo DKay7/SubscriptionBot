@@ -3,6 +3,8 @@ from aiogram import Bot
 import logging
 import asyncio
 
+from utils.db.subscription import unsubscribe_user_from_db
+
 
 async def send_broadcast_message(bot: Bot, user_id: int, text: str, disable_notification: bool = False,
                                  ban: bool = False, chat_id: int = None):
@@ -13,8 +15,11 @@ async def send_broadcast_message(bot: Bot, user_id: int, text: str, disable_noti
 
         if ban:
             result = await bot.ban_chat_member(chat_id=chat_id, user_id=user_id)
+
             if not result:
                 log.error(f"User `tg://user?id={user_id}` was not banned!!")
+            else:
+                unsubscribe_user_from_db(user_id)
 
     except exceptions.CantRestrictChatOwner:
         log.error(f"Target tg://user?id={user_id} can't ban chat owner")

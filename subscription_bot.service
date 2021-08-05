@@ -1,0 +1,14 @@
+[Unit]
+Description=Telegram bot for getting subscription payments
+After=network.target syslog.target mongodb.service
+
+[Service]
+Type=simple
+User=danny
+WorkingDirectory=/home/danny/PythonProjects/SubscriptionBot
+ExecStart=/usr/bin/make run
+RestartSec=10
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
