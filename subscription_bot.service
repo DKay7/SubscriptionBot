@@ -4,8 +4,8 @@ After=network.target syslog.target mongodb.service
 
 [Service]
 Type=simple
-User=danny
-WorkingDirectory=/home/danny/PythonProjects/SubscriptionBot
+User=root
+WorkingDirectory=/root/SubmissionBot
 ExecStart=/usr/bin/make run
 RestartSec=10
 Restart=always
