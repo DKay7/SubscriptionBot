@@ -1,7 +1,7 @@
 from apscheduler.triggers.cron import CronTrigger
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from utils.broadcasting import broadcaster
+from utils.channel.broadcasting import broadcaster
 from config.messages import MESSAGES
 from utils.db.subscription import get_users_without_sub, get_users_with_expired_sub
 from config.bot_config import BOT_CHANNEL_ID

@@ -12,7 +12,7 @@ from states.get_subscsription import GetSubscriptionStates
 from config.payments import PAYMENT_TOKEN, SUBSCRIPTION_PRICE, SUBSCRIPTION_IMAGE_URL, SUBSCRIPTION_IMAGE_WIDTH, \
     SUBSCRIPTION_IMAGE_HEIGHT
 from utils.db.subscription import has_free_month, get_sub_days_left
-from utils.telegram_channel import subscribe_user
+from utils.channel.telegram_channel import subscribe_user
 
 
 @dp.message_handler(Text(equals=KEYBOARDS['start']['subscription']), state='*')

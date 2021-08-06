@@ -4,7 +4,7 @@ from aiogram.contrib.fsm_storage.mongo import MongoStorage
 
 from config.bot_config import BOT_TOKEN
 from config.db import DB_STORAGE_HOST, DB_STORAGE_PORT, STORAGE_NAME
-from utils.subscription_checker import setup_scheduler
+from utils.channel.subscription_checker import setup_scheduler
 
 
 # initialize mongo database

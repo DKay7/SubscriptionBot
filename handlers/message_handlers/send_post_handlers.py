@@ -22,24 +22,31 @@ async def confirm_sending_post(message: Message):
 @dp.message_handler(Text(equals=KEYBOARDS['confirm_post']['yes']), state=SendPostStates.waiting_for_confirm)
 async def sending_post_confirmed(message: Message):
     await message.answer(MESSAGES['send_post_confirmed'], reply_markup=get_keyboard('remove'))
-    await SendPostStates.waiting_for_post.set()
+    await SendPostStates.waiting_for_post_photo.set()
 
 
-@dp.message_handler(state=SendPostStates.waiting_for_post, content_types=ContentTypes.PHOTO)
-async def get_post_form_user(message: Message, state: FSMContext):
-    if not message.caption:
-        await message.answer('Пост должен содержать подпись')
+@dp.message_handler(state=SendPostStates.waiting_for_post_photo, content_types=ContentTypes.PHOTO)
+async def get_post_photo_form_user(message: Message, state: FSMContext):
+    if message.media_group_id:
         return
 
     async with state.proxy() as data:
-        data['post_text'] = message.caption
         data['photo_id'] = str(message.photo[-1].file_id)
         data['sender_id'] = str(message.from_user.id)
         data['sender_name'] = str(message.from_user.full_name)
 
+    await message.answer(MESSAGES['send_post_text'])
+
+    await SendPostStates.waiting_for_post_text.set()
+
+
+@dp.message_handler(state=SendPostStates.waiting_for_post_text, content_types=ContentTypes.TEXT)
+async def get_post_text_form_user(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['post_text'] = message.text
+
     approve_keyboard = get_keyboard('approve_post')
     await message.answer(MESSAGES['send_post_approve'], reply_markup=approve_keyboard)
-
     await SendPostStates.waiting_for_approve.set()
 
 
@@ -68,21 +75,20 @@ async def get_payment(message: Message):
 
 
 @dp.message_handler(Text(equals=KEYBOARDS['approve_post']['edit']), state=SendPostStates.waiting_for_approve)
-async def get_post_form_user(message: Message):
+async def get_post_photo_form_user(message: Message):
     await message.answer(MESSAGES['send_post_confirmed'], reply_markup=get_keyboard('remove'))
-    await SendPostStates.waiting_for_post.set()
+    await SendPostStates.waiting_for_post_photo.set()
 
 
 @dp.message_handler(Text(equals=KEYBOARDS['approve_post']['edit']), state=SendPostStates.waiting_for_edit_post_approve)
 async def edited_post_re_edited(message: Message):
     await message.answer(MESSAGES['send_post_confirmed'], reply_markup=get_keyboard('remove'))
-    await SendPostStates.waiting_for_edit_post.set()
+    await SendPostStates.waiting_for_edit_post_photo.set()
 
 
-@dp.message_handler(state=SendPostStates.waiting_for_edit_post, content_types=ContentTypes.PHOTO)
-async def get_edited_post_form_user(message: Message, state: FSMContext):
-    if not message.caption:
-        await message.answer('Пост должен содержать подпись')
+@dp.message_handler(state=SendPostStates.waiting_for_edit_post_photo, content_types=ContentTypes.PHOTO)
+async def get_edited_post_photo_form_user(message: Message, state: FSMContext):
+    if message.media_group_id:
         return
 
     async with state.proxy() as data:
@@ -90,6 +96,15 @@ async def get_edited_post_form_user(message: Message, state: FSMContext):
         data['photo_id'] = str(message.photo[-1].file_id)
         data['sender_id'] = str(message.from_user.id)
         data['sender_name'] = str(message.from_user.full_name)
+
+    await message.answer(MESSAGES['send_post_text'])
+    await SendPostStates.waiting_for_edit_post_text.set()
+
+
+@dp.message_handler(state=SendPostStates.waiting_for_edit_post_text, content_types=ContentTypes.TEXT)
+async def get_edited_post_text_form_user(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['post_text'] = str(message.caption)
 
     approve_keyboard = get_keyboard('approve_post')
     await message.answer(MESSAGES['send_post_approve'], reply_markup=approve_keyboard)

@@ -5,7 +5,7 @@ from aiogram.types import ContentType
 from dispatcher import dp, bot
 from keyboards.reply_keyboards import get_keyboard
 from states.get_subscsription import GetSubscriptionStates
-from utils.telegram_channel import subscribe_user
+from utils.channel.telegram_channel import subscribe_user
 
 
 @dp.pre_checkout_query_handler(lambda query: query.invoice_payload == 'subscription',
