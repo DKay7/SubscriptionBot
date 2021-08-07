@@ -56,7 +56,7 @@ def get_users_with_expired_sub():
     today = datetime.utcnow()
     next_day = datetime.utcnow() + timedelta(days=1)
 
-    users = sub.find({"expired_date": {"$lte": next_day, "$gt": today},
+    users = sub.find({"expired_date": {"$lte": next_day, "$gte": today},
                       "subscribed": True},
                      {'telegram_user_id': True, '_id': False})
     users_list = list(map(lambda user: user['telegram_user_id'], users))
@@ -78,9 +78,10 @@ def get_users_with_ended_sub():
 
 def get_users_with_active_sub():
     sub = COLLS['subscriptions']
-    next_day = datetime.utcnow() + timedelta(days=1)
 
-    users = sub.find({"expired_date": {"$gt": next_day},
+    today = datetime.utcnow()
+
+    users = sub.find({"expired_date": {"$gte": today},
                       "subscribed": True},
                      {'telegram_user_id': True, '_id': False})
     users_list = list(map(lambda user: user['telegram_user_id'], users))

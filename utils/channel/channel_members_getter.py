@@ -4,7 +4,7 @@ from aiogram import Bot
 from telethon.sync import TelegramClient
 
 from config.bot_config import TELEGRAM_API_ID, TELEGRAM_API_HASH, BOT_CHANNEL_ID, BOT_TOKEN
-from utils.db.subscription import get_users_with_active_sub
+from utils.db.subscription import get_users_with_active_sub, get_users_with_ended_sub
 
 
 async def get_all_channel_members(bot: Bot):
@@ -30,12 +30,14 @@ async def get_channel_admins(bot: Bot):
 async def get_users_without_any_sub(bot: Bot):
     all_users = await get_all_channel_members(bot)
     with_sub_users = get_users_with_active_sub()
+    with_ended_sub_users = get_users_with_ended_sub()
     admins = await get_channel_admins(bot)
-    without_sub = set(all_users) - set(with_sub_users) - set(admins) - {bot.id}
+    without_sub = set(all_users) - set(with_sub_users) - set(with_ended_sub_users) - set(admins) - {bot.id}
 
     log = logging.getLogger("Channel members checker")
     log.debug(f"ALL {all_users}")
     log.debug(f"WITH SUB: {with_sub_users}")
+    log.debug(f"WITH ENDED SUB: {with_ended_sub_users}")
     log.debug(f"ADMINS {admins}")
     log.debug(f"TO KICK: {without_sub}")
 

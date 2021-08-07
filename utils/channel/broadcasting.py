@@ -64,6 +64,7 @@ async def broadcaster(bot: Bot, user_list,
     try:
         for user_id in user_list:
             if await send_broadcast_message(bot, user_id,
+                                            broadcast_name=broadcast_name,
                                             send_message=message, text=message,
                                             ban=ban, chat_id=chat_id):
                 count += 1

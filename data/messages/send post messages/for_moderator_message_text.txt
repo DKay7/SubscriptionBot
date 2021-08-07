@@ -1,5 +1,4 @@
-Пост от пользователя <a href="tg://user?id={sender_id}">{sender_name}</a>
-
-<code>-------Пост-------</code>
 {post_text}
-<code>------------------</code>
+
+<code>------------</code>
+Пост от пользователя <a href="tg://user?id={sender_id}">{sender_name}</a>

@@ -33,7 +33,7 @@ async def get_post_photo_form_user(message: Message, state: FSMContext):
     async with state.proxy() as data:
         data['photo_id'] = str(message.photo[-1].file_id)
         data['sender_id'] = str(message.from_user.id)
-        data['sender_name'] = str(message.from_user.full_name)
+        data['sender_name'] = str(message.from_user.mention)
 
     await message.answer(MESSAGES['send_post_text'])
 
@@ -92,10 +92,9 @@ async def get_edited_post_photo_form_user(message: Message, state: FSMContext):
         return
 
     async with state.proxy() as data:
-        data['post_text'] = str(message.caption)
         data['photo_id'] = str(message.photo[-1].file_id)
         data['sender_id'] = str(message.from_user.id)
-        data['sender_name'] = str(message.from_user.full_name)
+        data['sender_name'] = str(message.from_user.mention)
 
     await message.answer(MESSAGES['send_post_text'])
     await SendPostStates.waiting_for_edit_post_text.set()
@@ -104,7 +103,7 @@ async def get_edited_post_photo_form_user(message: Message, state: FSMContext):
 @dp.message_handler(state=SendPostStates.waiting_for_edit_post_text, content_types=ContentTypes.TEXT)
 async def get_edited_post_text_form_user(message: Message, state: FSMContext):
     async with state.proxy() as data:
-        data['post_text'] = str(message.caption)
+        data['post_text'] = message.text
 
     approve_keyboard = get_keyboard('approve_post')
     await message.answer(MESSAGES['send_post_approve'], reply_markup=approve_keyboard)

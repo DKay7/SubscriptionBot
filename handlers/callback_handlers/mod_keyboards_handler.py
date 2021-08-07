@@ -13,8 +13,7 @@ async def mod_accepted_handler(callback_query: CallbackQuery, callback_data: dic
     state = dp.current_state(user=sender_id, chat=sender_id)
     data = await state.get_data()
 
-    channel_post_caption = MESSAGES['post_for_channel'].format(sender_id=data['sender_id'],
-                                                               sender_name=data['sender_name'],
+    channel_post_caption = MESSAGES['post_for_channel'].format(sender_name=data['sender_name'],
                                                                post_text=data['post_text'])
     await bot.send_photo(BOT_CHANNEL_ID, caption=channel_post_caption, photo=data['photo_id'])
 
