@@ -42,4 +42,4 @@ async def mod_denied_handler(callback_query: CallbackQuery, callback_data):
     await bot.edit_message_caption(callback_query.message.chat.id, callback_query.message.message_id,
                                    caption=new_caption, reply_markup="")
 
-    await state.set_state(SendPostStates.waiting_for_edit_post)
+    await state.set_state(SendPostStates.waiting_for_edit_post_photo)

@@ -6,12 +6,16 @@ import asyncio
 from utils.db.subscription import unsubscribe_user_from_db
 
 
-async def send_broadcast_message(bot: Bot, user_id: int, text: str, disable_notification: bool = False,
-                                 ban: bool = False, chat_id: int = None):
-    log = logging.getLogger('broadcast')
+async def send_broadcast_message(bot: Bot, user_id,
+                                 send_message=True, text=None,
+                                 ban=False, chat_id=None,
+                                 broadcast_name="broadcast",
+                                 disable_notification=False):
+    log = logging.getLogger(broadcast_name)
 
     try:
-        await bot.send_message(user_id, text, disable_notification=disable_notification)
+        if send_message:
+            await bot.send_message(user_id, text, disable_notification=disable_notification)
 
         if ban:
             result = await bot.ban_chat_member(chat_id=chat_id, user_id=user_id)
@@ -48,18 +52,24 @@ async def send_broadcast_message(bot: Bot, user_id: int, text: str, disable_noti
     return False
 
 
-async def broadcaster(bot: Bot, user_list, message, ban=False, chat_id=None, broadcast_name="broadcast"):
+async def broadcaster(bot: Bot, user_list,
+                      send_message=True, message=None,
+                      ban=False, chat_id=None,
+                      broadcast_name="broadcast"):
     assert not ban or chat_id
+    assert not send_message or message
 
-    log = logging.getLogger('broadcast')
+    log = logging.getLogger(broadcast_name)
     count = 0
     try:
         for user_id in user_list:
-            if await send_broadcast_message(bot, user_id, message, ban=ban, chat_id=chat_id):
+            if await send_broadcast_message(bot, user_id,
+                                            send_message=message, text=message,
+                                            ban=ban, chat_id=chat_id):
                 count += 1
             await asyncio.sleep(0.1)
 
     finally:
-        log.info(f"{broadcast_name}: {count} messages successful sent.")
+        log.info(f"{count} messages successful sent.")
 
     return count
