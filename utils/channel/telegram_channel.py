@@ -2,7 +2,7 @@ from aiogram.types.chat import Chat
 from datetime import datetime, timedelta
 
 from config.bot_config import BOT_CHANNEL_ID
-from config.messages import MESSAGES
+from config.messages import message_texts
 from utils.db.subscription import upsert_user_subscription
 from dispatcher import bot
 
@@ -21,6 +21,6 @@ async def subscribe_user(user_id: int):
 
     upsert_user_subscription(user_id)
     link = await create_invite_link()
-    invite_text = MESSAGES["channel_invite"].format(link=link)
+    invite_text = message_texts["channel_invite"].format(link=link)
 
     return invite_text

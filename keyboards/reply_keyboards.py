@@ -1,6 +1,6 @@
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemove
 
-from config.keyboards import KEYBOARDS
+from config.keyboards import keyboards_texts
 
 
 def get_keyboard(kb_name):
@@ -9,7 +9,7 @@ def get_keyboard(kb_name):
 
     keyboard = ReplyKeyboardMarkup(resize_keyboard=True)
 
-    keyboard_data = KEYBOARDS[kb_name]
+    keyboard_data = keyboards_texts[kb_name]
     for key, value in keyboard_data.items():
         button = KeyboardButton(value)
         keyboard.add(button)

@@ -2,7 +2,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.types import PreCheckoutQuery, Message
 from aiogram.types import ContentType
 
-from config.messages import MESSAGES
+from config.messages import message_texts
 from dispatcher import dp, bot
 from keyboards.reply_keyboards import get_keyboard
 from states.send_post import SendPostStates
@@ -20,6 +20,6 @@ async def successful_payment(message: Message, state: FSMContext):
     await send_post_to_mods(state)
 
     remove_kb = get_keyboard('remove')
-    await message.answer(MESSAGES['post_has_send_to_mods'], reply_markup=remove_kb)
+    await message.answer(message_texts['post_has_send_to_mods'], reply_markup=remove_kb)
 
     await SendPostStates.waiting_for_moderator.set()
