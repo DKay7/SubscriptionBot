@@ -7,7 +7,7 @@ def load_messages():
 
     for message_file_name in glob(MESSAGES_TEXTS_DIR, recursive=True):
         command_name_raw = splitext(basename(message_file_name))[0]
-        command_name = command_name_raw.replace("_message_text", "")
+        command_name = command_name_raw.strip()
 
         with open(message_file_name, "r", encoding='utf-8') as file:
             command_message = file.read()
@@ -17,9 +17,9 @@ def load_messages():
     return messages
 
 
-MESSAGES_TEXTS_DIR = r"data/messages/**/*?_message_text.txt"
+MESSAGES_TEXTS_DIR = r"data/messages/**/*?.txt"
 MESSAGES_DIR = r"data/messages/"
-MESSAGES_GROUP_PATTERN = r"data/messages/{group}/**/*_message_text.txt"
+MESSAGES_GROUP_PATTERN = r"data/messages/{group}/**/*?.txt"
 MESSAGES_GROUP_PATH_PATTERN = r"data/messages/{group}/"
 
 message_texts = load_messages()

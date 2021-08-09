@@ -24,5 +24,5 @@ message_edit_callback = CallbackData("message_edit", "filename", "sender_id")
 accept_terms_callback = CallbackData("accept_terms", "user_id")
 
 
-KEYBOARDS_TEXTS_DIR = r"data/keyboards/*?_keyboard.json"
+KEYBOARDS_TEXTS_DIR = r"data/keyboards/*?.json"
 keyboards_texts = load_keyboards()
