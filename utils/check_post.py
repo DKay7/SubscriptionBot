@@ -12,8 +12,11 @@ async def send_post_to_mods(state: FSMContext):
     inline_keyboard = get_mod_decision_kb(data['sender_id'])
 
     post_text = message_texts['for_moderator'].format(sender_id=data['sender_id'],
-                                                      sender_name=data['sender_name'],
-                                                      post_text=data['post_text'])
+                                                      sender_real_name=data['sender_real_name'],
+                                                      sender_location=data['sender_location'],
+                                                      post_text=data['post_text'],
+                                                      preferences=data['preferences'],
+                                                      sender_nickname=data['sender_nickname'])
 
     await bot.send_photo(chat_id=BOT_MODERATOR_CHAT_ID, caption=post_text, photo=data['photo_id'],
                          reply_markup=inline_keyboard)

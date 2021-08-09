@@ -1,4 +1,8 @@
-{post_text}
-
-<code>------------</code>
 Данный ваш пост был отправлен в канал.
+<code>------------</code>
+
+<b>Имя:</b> {sender_real_name}
+<b>Местоположение:</b> {sender_location}
+<b>О нас:</b> {post_text}
+<b>Ищем:</b> {preferences}
+

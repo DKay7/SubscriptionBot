@@ -23,7 +23,47 @@ async def confirm_sending_post(message: Message):
 @dp.message_handler(Text(equals=keyboards_texts['confirm_post']['yes']), state=SendPostStates.waiting_for_confirm)
 async def sending_post_confirmed(message: Message):
     await message.answer(message_texts['send_post_confirmed'], reply_markup=get_keyboard('remove'))
+    await SendPostStates.waiting_for_send_name.set()
+
+
+@dp.message_handler(state=SendPostStates.waiting_for_send_name, content_types=ContentTypes.TEXT)
+async def get_name_form_user(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['sender_id'] = str(message.from_user.id)
+        data['sender_nickname'] = str(message.from_user.mention)
+        data['sender_real_name'] = message.text
+
+    await message.answer(message_texts['got_real_name'])
+    await SendPostStates.waiting_for_send_location.set()
+
+
+@dp.message_handler(state=SendPostStates.waiting_for_edit_name, content_types=ContentTypes.TEXT)
+async def get_edited_name_form_user(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['sender_id'] = str(message.from_user.id)
+        data['sender_nickname'] = str(message.from_user.mention)
+        data['sender_real_name'] = message.text
+
+    await message.answer(message_texts['got_real_name'])
+    await SendPostStates.waiting_for_edit_location.set()
+
+
+@dp.message_handler(state=SendPostStates.waiting_for_send_location, content_types=ContentTypes.TEXT)
+async def get_location_form_user(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['sender_location'] = message.text
+
+    await message.answer(message_texts['got_location'])
     await SendPostStates.waiting_for_post_photo.set()
+
+
+@dp.message_handler(state=SendPostStates.waiting_for_edit_location, content_types=ContentTypes.TEXT)
+async def get_edited_location_form_user(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['sender_location'] = message.text
+
+    await message.answer(message_texts['got_location'])
+    await SendPostStates.waiting_for_edit_post_photo.set()
 
 
 @dp.message_handler(state=SendPostStates.waiting_for_post_photo, content_types=ContentTypes.PHOTO)
@@ -33,12 +73,22 @@ async def get_post_photo_form_user(message: Message, state: FSMContext):
 
     async with state.proxy() as data:
         data['photo_id'] = str(message.photo[-1].file_id)
-        data['sender_id'] = str(message.from_user.id)
-        data['sender_name'] = str(message.from_user.mention)
 
-    await message.answer(message_texts['send_post_text'])
+    await message.answer(message_texts['got_photo'])
 
     await SendPostStates.waiting_for_post_text.set()
+
+
+@dp.message_handler(state=SendPostStates.waiting_for_edit_post_photo, content_types=ContentTypes.PHOTO)
+async def get_edited_post_photo_form_user(message: Message, state: FSMContext):
+    if message.media_group_id:
+        return
+
+    async with state.proxy() as data:
+        data['photo_id'] = str(message.photo[-1].file_id)
+
+    await message.answer(message_texts['got_photo'])
+    await SendPostStates.waiting_for_edit_post_text.set()
 
 
 @dp.message_handler(state=SendPostStates.waiting_for_post_text, content_types=ContentTypes.TEXT)
@@ -46,9 +96,38 @@ async def get_post_text_form_user(message: Message, state: FSMContext):
     async with state.proxy() as data:
         data['post_text'] = message.text
 
+    await SendPostStates.waiting_for_preferences.set()
+    await message.answer(message_texts['got_text'])
+
+
+@dp.message_handler(state=SendPostStates.waiting_for_edit_post_text, content_types=ContentTypes.TEXT)
+async def get_edited_post_text_form_user(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['post_text'] = message.text
+
+    await SendPostStates.waiting_for_edit_preferences.set()
+    await message.answer(message_texts['got_text'])
+
+
+@dp.message_handler(state=SendPostStates.waiting_for_preferences, content_types=ContentTypes.TEXT)
+async def get_user_preferences(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['preferences'] = message.text
+
     approve_keyboard = get_keyboard('approve_post')
     await message.answer(message_texts['send_post_approve'], reply_markup=approve_keyboard)
     await SendPostStates.waiting_for_approve.set()
+
+
+@dp.message_handler(state=SendPostStates.waiting_for_edit_preferences, content_types=ContentTypes.TEXT)
+async def get_edited_user_preferences(message: Message, state: FSMContext):
+    async with state.proxy() as data:
+        data['preferences'] = message.text
+
+    approve_keyboard = get_keyboard('approve_post')
+    await message.answer(message_texts['send_post_approve'], reply_markup=approve_keyboard)
+
+    await SendPostStates.waiting_for_edit_post_approve.set()
 
 
 @dp.message_handler(Text(equals=keyboards_texts['approve_post']['yes']), state=SendPostStates.waiting_for_approve)
@@ -75,44 +154,6 @@ async def get_payment(message: Message):
     )
 
 
-@dp.message_handler(Text(equals=keyboards_texts['approve_post']['edit']), state=SendPostStates.waiting_for_approve)
-async def get_post_photo_form_user(message: Message):
-    await message.answer(message_texts['send_post_confirmed'], reply_markup=get_keyboard('remove'))
-    await SendPostStates.waiting_for_post_photo.set()
-
-
-@dp.message_handler(Text(equals=keyboards_texts['approve_post']['edit']),
-                    state=SendPostStates.waiting_for_edit_post_approve)
-async def edited_post_re_edited(message: Message):
-    await message.answer(message_texts['send_post_confirmed'], reply_markup=get_keyboard('remove'))
-    await SendPostStates.waiting_for_edit_post_photo.set()
-
-
-@dp.message_handler(state=SendPostStates.waiting_for_edit_post_photo, content_types=ContentTypes.PHOTO)
-async def get_edited_post_photo_form_user(message: Message, state: FSMContext):
-    if message.media_group_id:
-        return
-
-    async with state.proxy() as data:
-        data['photo_id'] = str(message.photo[-1].file_id)
-        data['sender_id'] = str(message.from_user.id)
-        data['sender_name'] = str(message.from_user.mention)
-
-    await message.answer(message_texts['send_post_text'])
-    await SendPostStates.waiting_for_edit_post_text.set()
-
-
-@dp.message_handler(state=SendPostStates.waiting_for_edit_post_text, content_types=ContentTypes.TEXT)
-async def get_edited_post_text_form_user(message: Message, state: FSMContext):
-    async with state.proxy() as data:
-        data['post_text'] = message.text
-
-    approve_keyboard = get_keyboard('approve_post')
-    await message.answer(message_texts['send_post_approve'], reply_markup=approve_keyboard)
-
-    await SendPostStates.waiting_for_edit_post_approve.set()
-
-
 @dp.message_handler(Text(equals=keyboards_texts['approve_post']['yes']),
                     state=SendPostStates.waiting_for_edit_post_approve)
 async def edited_post_approved(message: Message, state: FSMContext):
@@ -120,6 +161,19 @@ async def edited_post_approved(message: Message, state: FSMContext):
     remove_kb = get_keyboard('remove')
     await message.answer(message_texts['post_has_send_to_mods'], reply_markup=remove_kb)
     await SendPostStates.waiting_for_moderator.set()
+
+
+@dp.message_handler(Text(equals=keyboards_texts['approve_post']['edit']), state=SendPostStates.waiting_for_approve)
+async def get_post_photo_form_user(message: Message):
+    await message.answer(message_texts['send_post_confirmed'], reply_markup=get_keyboard('remove'))
+    await SendPostStates.waiting_for_send_name.set()
+
+
+@dp.message_handler(Text(equals=keyboards_texts['approve_post']['edit']),
+                    state=SendPostStates.waiting_for_edit_post_approve)
+async def edited_post_re_edited(message: Message):
+    await message.answer(message_texts['send_post_confirmed'], reply_markup=get_keyboard('remove'))
+    await SendPostStates.waiting_for_edit_name.set()
 
 
 @dp.message_handler(Text(equals=keyboards_texts['approve_post']['no']),

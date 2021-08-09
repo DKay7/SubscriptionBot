@@ -1,4 +1,8 @@
-{post_text}
+Пост от пользователя {sender_nickname}
 
 <code>------------</code>
-Пост от пользователя {sender_name}
+
+<b>Имя:</b> {sender_real_name}
+<b>Местоположение:</b> {sender_location}
+<b>О нас:</b> {post_text}
+<b>Ищем:</b> {preferences}

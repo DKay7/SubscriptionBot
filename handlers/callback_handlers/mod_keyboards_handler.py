@@ -13,15 +13,26 @@ async def mod_accepted_handler(callback_query: CallbackQuery, callback_data: dic
     state = dp.current_state(user=sender_id, chat=sender_id)
     data = await state.get_data()
 
-    channel_post_caption = message_texts['post_for_channel'].format(sender_name=data['sender_name'],
-                                                                    post_text=data['post_text'])
+    channel_post_caption = message_texts['post_for_channel'].format(sender_id=data['sender_id'],
+                                                                    sender_real_name=data['sender_real_name'],
+                                                                    sender_location=data['sender_location'],
+                                                                    post_text=data['post_text'],
+                                                                    preferences=data['preferences'],
+                                                                    sender_nickname=data['sender_nickname'])
+
     await bot.send_photo(BOT_CHANNEL_ID, caption=channel_post_caption, photo=data['photo_id'])
 
-    post_accepted_info = message_texts['post_sent_to_channel'].format(post_text=data['post_text'])
+    post_accepted_info = message_texts['post_sent_to_channel'].format(sender_location=data['sender_location'],
+                                                                      sender_real_name=data['sender_real_name'],
+                                                                      post_text=data['post_text'],
+                                                                      preferences=data['preferences'])
+
     await bot.send_photo(sender_id, caption=post_accepted_info, photo=data['photo_id'])
 
     await callback_query.answer("Пост был принят и отправлен в канал.", show_alert=True)
-    new_caption = callback_query.message.caption + "\n------------------\nПРИНЯТО\n------------------\n"
+    new_caption = callback_query.message.caption + "\n<code>------------------\n" \
+                                                   "ПРИНЯТО\n" \
+                                                   "------------------</code>\n"
     await bot.edit_message_caption(callback_query.message.chat.id, callback_query.message.message_id,
                                    caption=new_caption, reply_markup="")
     await state.finish()
@@ -33,12 +44,18 @@ async def mod_denied_handler(callback_query: CallbackQuery, callback_data):
     state = dp.current_state(user=sender_id, chat=sender_id)
     data = await state.get_data()
 
-    edit_request_text = message_texts['edit_post_request'].format(post_text=data['post_text'])
+    edit_request_text = message_texts['edit_post_request'].format(sender_location=data['sender_location'],
+                                                                  sender_real_name=data['sender_real_name'],
+                                                                  post_text=data['post_text'],
+                                                                  preferences=data['preferences'])
+
     await bot.send_photo(sender_id, caption=edit_request_text, photo=data['photo_id'])
 
     await callback_query.answer("Пост был возвращен на доработку", show_alert=True)
-    new_caption = callback_query.message.caption + "\n------------------\nНА ДОРАБОТКУ\n------------------\n"
+    new_caption = callback_query.message.caption + "\n<code>------------------\n" \
+                                                   "НА ДОРАБОТКУ\n" \
+                                                   "------------------</code>\n"
     await bot.edit_message_caption(callback_query.message.chat.id, callback_query.message.message_id,
                                    caption=new_caption, reply_markup="")
 
-    await state.set_state(SendPostStates.waiting_for_edit_post_photo)
+    await state.set_state(SendPostStates.waiting_for_edit_name)
