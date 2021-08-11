@@ -3,7 +3,7 @@ from aiogram.types import CallbackQuery
 from config.messages import message_texts
 from dispatcher import dp, bot
 from config.keyboards import mod_callback
-from states.send_post import SendPostStates
+from keyboards.inline_keyboards import get_user_ready_to_edit_post_kb
 from config.bot_config import BOT_CHANNEL_ID
 
 
@@ -48,8 +48,8 @@ async def mod_denied_handler(callback_query: CallbackQuery, callback_data):
                                                                   sender_real_name=data['sender_real_name'],
                                                                   post_text=data['post_text'],
                                                                   preferences=data['preferences'])
-
-    await bot.send_photo(sender_id, caption=edit_request_text, photo=data['photo_id'])
+    reply_keyboard = get_user_ready_to_edit_post_kb()
+    await bot.send_photo(sender_id, caption=edit_request_text, photo=data['photo_id'], reply_markup=reply_keyboard)
 
     await callback_query.answer("Пост был возвращен на доработку", show_alert=True)
     new_caption = callback_query.message.caption + "\n<code>------------------\n" \
@@ -58,4 +58,3 @@ async def mod_denied_handler(callback_query: CallbackQuery, callback_data):
     await bot.edit_message_caption(callback_query.message.chat.id, callback_query.message.message_id,
                                    caption=new_caption, reply_markup="")
 
-    await state.set_state(SendPostStates.waiting_for_edit_name)

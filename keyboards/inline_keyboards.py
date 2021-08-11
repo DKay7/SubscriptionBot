@@ -36,3 +36,12 @@ def get_accept_service_terms_kb(user_id):
     accept_terms_kb.add(edit_button)
 
     return accept_terms_kb
+
+
+def get_user_ready_to_edit_post_kb():
+    ready_to_edit_button = InlineKeyboardButton('Редактировать пост', callback_data="user_ready")
+
+    ready_to_edit_kb = InlineKeyboardMarkup()
+    ready_to_edit_kb.add(ready_to_edit_button)
+
+    return ready_to_edit_kb
