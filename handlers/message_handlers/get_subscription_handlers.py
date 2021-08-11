@@ -10,8 +10,8 @@ from config.keyboards import keyboards_texts
 from keyboards.reply_keyboards import get_keyboard
 from states.accept_terms import AcceptTerms
 from states.get_subscsription import GetSubscriptionStates
-from config.payments import PAYMENT_TOKEN, SUBSCRIPTION_PRICE, SUBSCRIPTION_IMAGE_URL, SUBSCRIPTION_IMAGE_WIDTH, \
-    SUBSCRIPTION_IMAGE_HEIGHT
+from config.payments import PAYMENT_TOKEN, SUBSCRIPTION_IMAGE_URL, SUBSCRIPTION_IMAGE_HEIGHT, SUBSCRIPTION_IMAGE_WIDTH,\
+    SUBSCRIPTION_PHOTO_SIZE, SUBSCRIPTION_PRICE
 from utils.db.subscription import has_free_month, get_sub_days_left
 from utils.channel.telegram_channel import subscribe_user
 
@@ -21,7 +21,7 @@ async def get_subscription_confirm(message: Message):
 
     if has_free_month(message.from_user.id):
         approve_kb_markup = get_keyboard('confirm_subscription')
-        await message.answer(message_texts['free_month_info'], reply_markup=approve_kb_markup)
+        await message.answer(message_texts['free_period_info'], reply_markup=approve_kb_markup)
         await GetSubscriptionStates.waiting_for_confirm_free.set()
 
     else:
@@ -62,7 +62,7 @@ async def subscription_confirmed(message: Message):
         photo_url=SUBSCRIPTION_IMAGE_URL,
         photo_height=SUBSCRIPTION_IMAGE_HEIGHT,
         photo_width=SUBSCRIPTION_IMAGE_WIDTH,
-        photo_size=512,
+        photo_size=SUBSCRIPTION_PHOTO_SIZE,
         is_flexible=False,
         prices=[SUBSCRIPTION_PRICE],
         start_parameter='channel-subscription',

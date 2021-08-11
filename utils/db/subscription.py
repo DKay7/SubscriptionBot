@@ -1,4 +1,3 @@
-import calendar
 from datetime import datetime, timedelta
 
 from utils.db.connection import COLLS
@@ -11,8 +10,7 @@ def upsert_user_subscription(telegram_user_id: int):
 
     new_expired_date = old_date if old_date > datetime.utcnow() else datetime.utcnow()
 
-    days_in_month = calendar.monthrange(new_expired_date.year, new_expired_date.month)[1]
-    new_expired_date += timedelta(days=days_in_month)
+    new_expired_date += timedelta(days=7)
 
     sub.update_one(
         {"telegram_user_id": telegram_user_id},

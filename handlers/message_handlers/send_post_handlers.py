@@ -1,4 +1,4 @@
-from config.payments import PAYMENT_TOKEN, SEND_POST_PRICE, \
+from config.payments import PAYMENT_TOKEN, SEND_POST_PRICE, SEND_POST_PHOTO_SIZE, \
     SEND_POST_IMAGE_WIDTH, SEND_POST_IMAGE_HEIGHT, SEND_POST_IMAGE_URL
 from dispatcher import dp, bot
 from aiogram.types import Message, ContentTypes
@@ -146,7 +146,7 @@ async def get_payment(message: Message):
         photo_url=SEND_POST_IMAGE_URL,
         photo_height=SEND_POST_IMAGE_HEIGHT,
         photo_width=SEND_POST_IMAGE_WIDTH,
-        photo_size=512,
+        photo_size=SEND_POST_PHOTO_SIZE,
         is_flexible=False,
         prices=[SEND_POST_PRICE],
         start_parameter='channel-send-post',
