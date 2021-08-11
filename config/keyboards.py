@@ -22,7 +22,7 @@ def load_keyboards():
 mod_callback = CallbackData("mod_decision", "decision", "sender_id")
 message_edit_callback = CallbackData("message_edit", "filename", "sender_id")
 accept_terms_callback = CallbackData("accept_terms", "user_id")
-
+post_comment_callback = CallbackData("post_comment", "sender_id")
 
 KEYBOARDS_TEXTS_DIR = r"data/keyboards/*?.json"
 keyboards_texts = load_keyboards()

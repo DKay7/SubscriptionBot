@@ -1,5 +1,5 @@
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
-from config.keyboards import mod_callback, message_edit_callback, accept_terms_callback
+from config.keyboards import mod_callback, message_edit_callback, accept_terms_callback, post_comment_callback
 
 
 def get_mod_decision_kb(sender_id):
@@ -16,6 +16,16 @@ def get_mod_decision_kb(sender_id):
     mod_decision_kb.add(deny_button)
 
     return mod_decision_kb
+
+
+def get_add_comment_to_post_kb(sender_id):
+    callback = post_comment_callback.new(sender_id=sender_id)
+    add_comment_button = InlineKeyboardButton('Добавить комментарий к посту', callback_data=callback)
+
+    add_comment_kb = InlineKeyboardMarkup()
+    add_comment_kb.add(add_comment_button)
+
+    return add_comment_kb
 
 
 def get_message_edit_kb(filename, sender_id):

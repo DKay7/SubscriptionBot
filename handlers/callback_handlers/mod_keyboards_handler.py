@@ -2,12 +2,13 @@ from aiogram.types import CallbackQuery
 
 from config.messages import message_texts
 from dispatcher import dp, bot
-from config.keyboards import mod_callback
-from keyboards.inline_keyboards import get_user_ready_to_edit_post_kb
+from config.keyboards import mod_callback, post_comment_callback
+from keyboards.inline_keyboards import get_user_ready_to_edit_post_kb, get_add_comment_to_post_kb
 from config.bot_config import BOT_CHANNEL_ID
+from states.add_comment_states import AddComment
 
 
-@dp.callback_query_handler(mod_callback.filter(decision="accepted"))
+@dp.callback_query_handler(mod_callback.filter(decision="accepted"), state="*")
 async def mod_accepted_handler(callback_query: CallbackQuery, callback_data: dict):
     sender_id = int(callback_data['sender_id'])
     state = dp.current_state(user=sender_id, chat=sender_id)
@@ -38,7 +39,7 @@ async def mod_accepted_handler(callback_query: CallbackQuery, callback_data: dic
     await state.finish()
 
 
-@dp.callback_query_handler(mod_callback.filter(decision='denied'))
+@dp.callback_query_handler(mod_callback.filter(decision='denied'), state="*")
 async def mod_denied_handler(callback_query: CallbackQuery, callback_data):
     sender_id = int(callback_data['sender_id'])
     state = dp.current_state(user=sender_id, chat=sender_id)
@@ -52,9 +53,22 @@ async def mod_denied_handler(callback_query: CallbackQuery, callback_data):
     await bot.send_photo(sender_id, caption=edit_request_text, photo=data['photo_id'], reply_markup=reply_keyboard)
 
     await callback_query.answer("Пост был возвращен на доработку", show_alert=True)
+    add_comment_keyboard = get_add_comment_to_post_kb(sender_id)
     new_caption = callback_query.message.caption + "\n<code>------------------\n" \
                                                    "НА ДОРАБОТКУ\n" \
                                                    "------------------</code>\n"
     await bot.edit_message_caption(callback_query.message.chat.id, callback_query.message.message_id,
-                                   caption=new_caption, reply_markup="")
+                                   caption=new_caption, reply_markup=add_comment_keyboard)
 
+
+@dp.callback_query_handler(post_comment_callback.filter(), state="*")
+async def mod_add_comment_handler(callback_query: CallbackQuery, callback_data):
+    post_author_id = int(callback_data['sender_id'])
+    await callback_query.answer()
+    await bot.edit_message_reply_markup(callback_query.message.chat.id, callback_query.message.message_id,
+                                        reply_markup="")
+
+    await callback_query.message.answer(message_texts['add_comment_notation'])
+    state = dp.current_state(user=callback_query.from_user.id, chat=callback_query.message.chat.id)
+    await state.update_data(post_author_id=post_author_id)
+    await state.set_state(AddComment.waiting_for_comment)
